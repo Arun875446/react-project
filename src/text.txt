@@ -1,0 +1,87 @@
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
+
+import api from '@/api';
+import ListingFilters from '@/components/ListingFilters';
+import ListingList from '@/components/ListingList';
+import { Separator, Spinner } from '@/components/ui';
+import useFetch from '@/hooks/useFetch';
+
+const HomePage = () => {
+  const [searchListing, setSearchListing] = useState({});
+
+  const { listings, loading, error } = useFetch('/api/listings', {
+    params: searchListing,
+  });
+
+  const handleFilters = (filters) => {
+    setSearchListing(filters);
+  };
+
+  return (
+    <div className='container py-4'>
+      <ListingFilters onChange={handleFilters} />
+      <Separator className='my-4' />
+      {loading ? (
+        <div className='flex justify-center'>
+          <Spinner className='my-4' />
+        </div>
+      ) : error ? (
+        <div className='text-center'>Something went wrong 🥲</div>
+      ) : (
+        <ListingList listings={listings} />
+      )}
+    </div>
+  );
+};
+export default HomePage;
+....................................
+
+
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
+
+import api from '@/api';
+import ListingFilters from '@/components/ListingFilters';
+import ListingList from '@/components/ListingList';
+import { Separator, Spinner } from '@/components/ui';
+
+const useFetch = (url, options) => {
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const abortController = useRef(null);
+  useEffect(() => {
+    setLoading(true);
+    setError(false);
+    abortController.current = new AbortController();
+    api
+      .get(url, {
+        ...options,
+        signal: abortController.current?.signal,
+      })
+      .then((response) => {
+        setListings(response.data);
+
+        console.log(listings);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (axios.isCancel(error)) {
+          return;
+        }
+        setError(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    return () => {
+      abortController.current?.abort();
+    };
+  }, [url, options]);
+
+  return { listings, loading, error };
+};
+export default useFetch;

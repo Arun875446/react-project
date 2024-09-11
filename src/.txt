@@ -1,0 +1,43 @@
+import { useEffect, useState } from 'react';
+
+import api from '@/api';
+import ListingFilters from '@/components/ListingFilters';
+import ListingList from '@/components/ListingList';
+import { Separator, Spinner } from '@/components/ui';
+
+const HomePage = () => {
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    api
+      .get('/api/listgs')
+      .then((response) => {
+        setListings(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div className='container py-4'>
+      <ListingFilters />
+      <Separator className='my-4' />
+      {loading ? (
+        <div className='flex justify-center'>
+          <Spinner className='my-4' />
+        </div>
+      ) : error ? (
+        <div className='text-center'>Something went wrong 🥲</div>
+      ) : (
+        <ListingList listings={listings} />
+      )}
+    </div>
+  );
+};
+export default HomePage;
