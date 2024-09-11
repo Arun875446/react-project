@@ -7,6 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui';
+import { getImageUrl } from '@/lib/utils/images';
 
 const ListingDetailsCardImages = ({ listing }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -15,7 +16,8 @@ const ListingDetailsCardImages = ({ listing }) => {
     <>
       <img
         className='mb-4 h-[500px] w-full rounded-md object-cover'
-        src={`/src/assets/${listing.images[currentImageIndex]}`}
+        // src={`/src/assets/${listing.images[currentImageIndex]}`}
+        src={getImageUrl(listing.images[currentImageIndex])}
         alt={listing.name}
       />
       <Carousel className='mx-auto mb-4 w-[90%]'>
@@ -29,7 +31,8 @@ const ListingDetailsCardImages = ({ listing }) => {
             >
               <img
                 className='h-52 w-full object-cover shadow-sm'
-                src={`/src/assets/${image}`}
+                // src={`/src/assets/${image}`}
+                src={getImageUrl(image)}
                 alt={listing.name}
               />
             </CarouselItem>
